@@ -15,8 +15,11 @@ class View:
         print(f"| {board[7]} | {board[8]} | {board[9]} |   7  8  9")
         print('+---+---+---+')
 
+    def greet(self):
+        print("Welcome to Tic Tac Toe!")
+
     def print_winner(self):
-        print(self.model.get_winner())
+        print(f"The {self.model.get_winner()} won the game!")
 
     def print_draw(self):
         print("No winner - it's a draw!")
@@ -24,7 +27,12 @@ class View:
     def print_is_taken(self):
         print("That square already taken!")
 
-    def momo(self):
-        return "selfoooo"
+    def choose_mode(self):
+        print("We have 2 modes in our game:")
+        return "enter 'p' for player mode and 'a' for ai mode: \n"
 
+    def want_previous_game(self):
+        return "Do you want load the previous game? y/n: "
 
+    def exit_game(self):
+        pass

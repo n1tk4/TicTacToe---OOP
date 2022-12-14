@@ -1,28 +1,18 @@
 class Model:
-    """Creates the board and hold the current state about the board"""
-
-
     def __init__(self):
         self.board = self.new_board()
         self.winner = ' '
         self.valid_inputs = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.player = 'O'
 
-
-    def current_board(self):
-        return self.board
-
-
-
     @staticmethod
     def new_board():
         board = {
-            1 : ' ', 2 : ' ', 3 : ' ',
+            1 : 'O', 2 : ' ', 3 : ' ',
             4 : ' ', 5 : ' ', 6 : ' ',
-            7 : ' ', 8 : ' ', 9 : ' '
+            7 : 'X', 8 : ' ', 9 : 'O'
         }
         return board
-
 
     def get_winner(self):
         # Rows

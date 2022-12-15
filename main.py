@@ -2,4 +2,4 @@ from Controller import Controller
 
 if __name__ == "__main__":
     play = Controller()
-    play.player_mode()
+    play.play()

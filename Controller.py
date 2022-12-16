@@ -1,7 +1,7 @@
 from Model import *
 from View import *
 import json
-from functools import lru_cache
+import random
 
 
 class Controller:
@@ -9,34 +9,26 @@ class Controller:
     def __init__(self):
         self.model = Model()
         self.view = View(Model())
-        self.call_function_times = 0
+        self.scores = {
+            'X' : -1,
+            'O' : 1,
+            ' ' : 0
+        }
 
     def get_move(self):
         self.chosen_position = None
         while self.chosen_position not in self.model.valid_inputs:
             try:
-                self.chosen_position = input("Please give a legal position: ")
-            except KeyboardInterrupt:
-                pass
-            try:
-                self.chosen_position = int(self.chosen_position)
-            except KeyboardInterrupt:
-                pass
+                self.chosen_position = int(input(self.view.print_value_error()))
+            #except TypeError:
+                #quit()
             except ValueError:
-                self.chosen_position = input("Please give a legal position: ")
+                self.view.print_value_error()
             except KeyboardInterrupt:
-                pass
+                quit()
             if self.chosen_position in self.model.valid_inputs:
-
                 break
         return self.chosen_position
-
-    def is_empty(self, board, chosen_position):
-        while board[chosen_position] != ' ':
-            self.view.print_is_taken()
-            chosen_position = self.get_move()
-            return True
-        return False
 
     def make_move(self, board, chosen_position, player):
         while board[chosen_position] != ' ':
@@ -49,67 +41,54 @@ class Controller:
             self.model.player = 'X'
         else:
             self.model.player = 'O'
-            # print O is turn
         return self.model.player
 
     def computer(self, board):
-        bestScore = -1000
-        bestMove = 0
-        score = None
+        best_score = -1000
         for key in board.keys():
             print(f"current key is {key}")
             if (board[key] == ' '):
                 board[key] = 'O'
-                print(f"current score is {bestScore}")
-                score = self.minimax(False)
+                print(fd,"current score is {best_score}")
+                score = self.minimax(board, False)
                 print(f"minmax score {score}")
                 print(self.model.board)
                 board[key] = ' '
-                if (score > bestScore):
-                    bestScore = score
-                    print(f"bestsscore {bestScore}")
-                    bestMove = key
-                    print(f"Best move {bestMove}")
-        return bestMove
+                if (score > best_score):
+                    best_score = score
+                    best_move = key
+        return best_move
 
-    def best_move(self, computer):
-        board = self.model.board
-        board[computer] = 'O'
+    def random_move(self, board):
+        r = random.choice(board)
+        while True:
+            if r[board] == ' ':
+                return r
 
-    @lru_cache()
-    def minimax(self, is_maximizing):
-        print(f"position in calculation {self.model.board}")
-        self.call_function_times = self.call_function_times + 1
-        print(f"call function times {self.call_function_times}")
-        score = None
-        if self.model.get_winner()  == 'O':
-            return 1
-        elif self.model.get_winner() == 'X':
-            return -1
-        elif self.model.is_draw():
-            return 0
-        self.model.winner = ' '
+    def minimax(self, board, is_maximizing):
+        result = self.get_winner(board)
+        if result != ' ':
+            score = self.scores[result]
         if is_maximizing:
-            bestScore = -99
-            for key in self.model.board.keys():
-                if (self.model.board[key] == ' '):
-                    self.model.board[key] = 'O'
-                    score = self.minimax(False)
-                    self.model.board[key] = ' '
-                    if (score > bestScore):
-                        bestScore = score
-            return bestScore
+            best_score = -99
+            for key in board.keys():
+                if (board[key] == ' '):
+                    board[key] = 'O'
+                    score = self.minimax(board, False)
+                    board[key] = ' '
+                    if (score > best_score):
+                        best_score = score
+            return best_score
         else:
-            bestScore = 99
-            for key in self.model.board.keys():
-                if (self.model.board[key] == ' '):
-                    self.model.board[key] = 'X'
-                    score = self.minimax(True)
-                    self.model.board[key] = ' '
-                    if (score < bestScore):
-                        bestScore = score
-            self.call_function_times = 0
-            return bestScore
+            best_score = 99
+            for key in board.keys():
+                if (board[key] == ' '):
+                    board[key] = 'X'
+                    score = self.minimax(board, True)
+                    board[key] = ' '
+                    if (score < best_score):
+                        best_score = score
+            return best_score
 
     def save_game(self):
         filename = 'board.json'
@@ -135,30 +114,64 @@ class Controller:
 
     def player_mode(self):
         self.ask_load()
+        self.view.print_player_mode()
+        if self.model.whose_move():
+            self.model.player = 'O'
         while True:
             self.view.print_board(self.model.board)
             self.save_game()
-            if self.model.get_winner() != ' ':
+            if self.get_winner(self.model.board) != ' ':
                 self.view.print_winner()
                 break
-            elif self.model.is_draw():
+            elif self.is_draw(self.model.board):
                 self.view.print_draw()
                 break
+
             self.make_move(self.model.board, self.get_move(), self.player())
 
     def ai_mode(self):
-        self.ask_load()
+        self.ask_load() #patch
+        self.view.print_ai_mode()
         counter = 0
         while True:
             self.view.print_board(self.model.board)
-            if self.model.get_winner() != ' ':
+            # comp move
+            if self.get_winner(self.model.board) != ' ':
                 self.view.print_winner()
                 break
             if counter % 2 == 0:
                 self.make_move(self.model.board, self.get_move(), self.player())
                 self.view.print_winner()
             else:
+                print(f"{self.computer(self.model.board)}")
                 self.make_move(self.model.board, self.computer(self.model.board), self.player())
+                self.model.winner=' '
+            counter += 1
+
+    def random_move(self, board):
+        while True:
+            r = random.randint(1, 9)
+            print(f"here is r: {r}")
+            if board[r] == ' ':
+                board[r] = 'O'
+                break
+            else:
+                continue
+
+    def random_mode(self):
+        self.ask_load()
+        self.view.print_ai_mode()
+        counter = 0
+        while True:
+            self.view.print_board(self.model.board)
+            if self.get_winner(self.model.board) != ' ':
+                self.view.print_winner()
+                break
+            if counter % 2 == 0:
+                self.make_move(self.model.board, self.get_move(), 'X')
+                self.view.print_winner()
+            else:
+                self.random_move(self.model.board)
                 self.model.winner=' '
             counter += 1
 
@@ -171,4 +184,37 @@ class Controller:
 
     def play(self):
         self.view.greet()
-        self.which_mode()
+        try:
+            self.which_mode()
+        except KeyboardInterrupt:
+            quit()
+
+    def get_winner(self, board):
+        # Rows
+        if board[1] == board[2] == board[3] and board[1] != ' ':
+            self.model.winner = board[1]
+        elif board[4] == board[5] == board[6] and board[4] != ' ':
+            self.model.winner = board[4]
+        elif board[7] == board[8] == board[9] and board[7] != ' ':
+            self.model.winner = board[7]
+
+        # Columns
+        elif board[1] == board[4] == board[7] and board[1] != ' ':
+            self.model.winner = board[1]
+        elif board[2] == board[5] == board[8] and board[2] != ' ':
+            self.model.winner = board[2]
+        elif board[3] == board[6] == board[9] and board[3] != ' ':
+            self.model.winner = board[3]
+
+        # Diagonals
+        elif board[1] == board[5] == board[9] and board[1] != ' ':
+            self.model.winner = board[5]
+        elif board[3] == board[5] == board[7] and board[3]!= ' ':
+            self.model.winner = board[5]
+        return self.model.winner
+
+    def is_draw(self, board):
+        for key in board.keys():
+            if board[key] == ' ':
+                return False
+        return True

@@ -19,7 +19,7 @@ class View:
         print("Welcome to Tic Tac Toe!")
 
     def print_winner(self):
-        print(f"The {self.model.get_winner()} won the game!")
+        print(f"The {self.model.winner} won the game!")
 
     def print_draw(self):
         print("No winner - it's a draw!")
@@ -34,5 +34,22 @@ class View:
     def want_previous_game(self):
         return "Do you want load the previous game? y/n: "
 
+    def not_possible(self):
+        "Can't make move {0}, square already taken!"
+
     def exit_game(self):
-        pass
+        print("Enter 'y' to exit: ")
+
+    def print_ai_mode(self):
+        print("AI mode has been started...")
+
+    def print_player_mode(self):
+        print("Player mode has been started...")
+
+    def print_value_error(self):
+        print("\nPlease, give a valid number: ")
+
+    def print_input_number(self):
+        return "\nPlease, give a spot's position: "
+
+

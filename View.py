@@ -51,5 +51,3 @@ class View:
 
     def print_input_number(self):
         return "\nPlease, give a spot's position: "
-
-

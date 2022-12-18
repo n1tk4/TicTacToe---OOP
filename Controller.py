@@ -72,11 +72,6 @@ class Controller:
                 return False
         return True
 
-    def ask_load(self):
-        inp = input(self.view.want_previous_game())
-        if inp == 'y':
-            self.model.board = self.features.load_game()
-
     def which_mode(self):
         inp = input(self.view.choose_mode())
         if inp == 'a':
@@ -85,7 +80,7 @@ class Controller:
             self.player_mode()
 
     def player_mode(self):
-        self.ask_load()
+        self.features.ask_load()
         self.view.print_player_mode()
         if self.model.whose_move():
             self.model.player = 'O'
@@ -102,7 +97,7 @@ class Controller:
             self.make_move(self.model.board, self.get_move(), self.player())
 
     def ai_mode(self):
-        self.ask_load() #patch
+        self.features.ask_load()
         self.view.print_ai_mode()
         counter = 0
         while True:

@@ -13,8 +13,6 @@ class Model:
         }
         return board
 
-
-
     def winner_is_found(self):
         if self.get_winner() != ' ':
             return True
@@ -24,4 +22,3 @@ class Model:
             return True #X is turn
         else:
             return False
-

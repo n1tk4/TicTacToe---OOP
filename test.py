@@ -3,6 +3,7 @@ import unittest
 from Model import *
 from unittest.mock import patch
 from unittest.mock import patch
+import threading
 
 
 class TestController(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestController(unittest.TestCase):
         self.test_view = View(Model())
 
     def test_get_move(self):
-        with patch('builtins', 'input', return_value=1):
+        with patch('builtins.input', return_value=1):
             self.assertEqual(self.test_controller.get_move(), 1)
 
     def raise_keyboard_interrupt(self):
@@ -68,6 +69,15 @@ class TestController(unittest.TestCase):
         with self.assertRaises(KeyboardInterrupt):
             with patch.object('builtins.input', return_value=self.raise_keyboard_interrupt()):
                 self.test_controller.play()
+
+    def test_which_mode_choose_mode_called(self):
+        with patch.object(self.test_controller.view, 'choose_mode') as mock_choose_mode:
+            with patch('builtins.input', return_value='a'):
+                thread = threading.Thread(target=self.test_controller.which_mode)
+                thread.start()
+                thread.join(1.0)
+
+        mock_choose_mode.assert_called()
 
 
 if __name__ == '__main__':

@@ -13,9 +13,9 @@ class TestController(unittest.TestCase):
         self.test_model = Model()
         self.test_view = View(Model())
 
-    def test_get_move(self):
-        with patch('builtins.input', return_value=1):
-            self.assertEqual(self.test_controller.get_move(), 1)
+    @patch('builtins.input', return_value=1)
+    def test_get_move(self, mock_input):
+        self.assertEqual(self.test_controller.get_move(), 1)
 
     def raise_keyboard_interrupt(self):
         raise KeyboardInterrupt
@@ -39,7 +39,8 @@ class TestController(unittest.TestCase):
         self.assertEqual(self.test_controller.make_move(board, 2, player), {1 : ' ', 2 : 'X', 3 : ' ', 4 : ' ', 5 : ' ', 6 : ' ', 7 : ' ', 8 : ' ', 9 : ' '})
 
     def test_player(self):
-        self.test_model.player == 'X'
+        self.test_controller.model.player = 'X'
+        self.test_controller.player()
         assert self.test_controller.model.player == 'O'
 
     def test_get_winner(self):
@@ -67,7 +68,7 @@ class TestController(unittest.TestCase):
 
     def test_play(self):
         with self.assertRaises(KeyboardInterrupt):
-            with patch.object('builtins.input', return_value=self.raise_keyboard_interrupt()):
+            with patch('builtins.input', return_value=self.raise_keyboard_interrupt()):
                 self.test_controller.play()
 
     def test_which_mode_choose_mode_called(self):
@@ -75,10 +76,40 @@ class TestController(unittest.TestCase):
             with patch('builtins.input', return_value='a'):
                 thread = threading.Thread(target=self.test_controller.which_mode)
                 thread.start()
-                thread.join(1.0)
-
+                thread.join(0.001)
         mock_choose_mode.assert_called()
 
+    def test_which_mode_player_mode_called(self):
+        with patch.object(self.test_controller, 'player_mode') as mock_player_mode:
+            with patch('builtins.input', return_value=0):
+                thread = threading.Thread(target=self.test_controller.which_mode)
+                thread.start()
+                thread.join(0.001)
+        mock_player_mode.assert_called()
 
+    def test_play_greet(self):
+        with patch.object(self.test_controller.view, 'greet') as mock_greet:
+            with patch('builtins.input', return_value='a'):
+                thread = threading.Thread(target=self.test_controller.play)
+                thread.start()
+                thread.join(0.001)
+        mock_greet.assert_called()
+
+    def test_play_which_mode(self):
+        with patch.object(self.test_controller, 'which_mode') as mock_which_mode:
+            with patch('builtins.input', return_value='a'):
+                thread = threading.Thread(target=self.test_controller.play)
+                thread.start()
+                thread.join(0.001)
+        mock_which_mode.assert_called()
+
+    def test_play_keyboard_interrupt(self):
+        with self.assertRaises(KeyboardInterrupt):
+            with patch.object('builtins', 'input', return_value=self.raise_keyboard_interrupt()):
+                thread = threading.Thread(target=self.test_controller.play)
+                thread.start()
+                thread.join(0.001)
+
+                
 if __name__ == '__main__':
     unittest.main()

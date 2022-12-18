@@ -2,11 +2,11 @@ from Model import *
 import Controller
 import json
 
+
 class Features:
     def __init__(self, controller):
         self.model = Model()
         self.controller = controller
-
 
     def computer(self, board):
         best_score = -1000
@@ -62,3 +62,8 @@ class Features:
             board = data["board"]
             board = {int(k):str(v) for k,v in board.items()}
         return board
+
+    def ask_load(self):
+        inp = input("Do you want load the previous game? y/n: ") #self.view.print_want_previous_game()
+        if inp == 'y':
+            self.model.board = self.features.load_game()

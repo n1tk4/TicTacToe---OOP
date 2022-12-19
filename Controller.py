@@ -9,22 +9,17 @@ class Controller:
         self.model = Model()
         self.view = View(Model())
         self.features = Features(self)
-        self.scores = {
-            'X' : -1,
-            'O' : 1,
-            ' ' : 0
-        }
 
     def get_move(self):
         self.chosen_position = None
-        while self.chosen_position not in self.model.valid_inputs:
+        while self.chosen_position not in range(1, 10):
             try:
                 self.chosen_position = int(input(self.view.print_input_number()))
             except ValueError:
                 self.view.print_value_error()
             except KeyboardInterrupt:
                 quit()
-            if self.chosen_position in self.model.valid_inputs:
+            if self.chosen_position in range(1, 10):
                 break
         return self.chosen_position
 
@@ -82,7 +77,7 @@ class Controller:
     def player_mode(self):
         self.features.ask_load()
         self.view.print_player_mode()
-        if self.model.whose_move():
+        if self.model.whose_move():     # it's useful by loading a game
             self.model.player = 'O'
         while True:
             self.view.print_board(self.model.board)

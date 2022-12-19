@@ -28,9 +28,6 @@ class View:
         print("We have 2 modes in our game:")
         return "enter 'p' for player mode and 'a' for ai mode: \n"
 
-    def want_previous_game(self):
-        return "Do you want load the previous game? y/n: "
-
     def not_possible(self, square):
         print(f"Can't make move {square}, square already taken!")
 

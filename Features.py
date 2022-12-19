@@ -7,6 +7,10 @@ class Features:
     def __init__(self, controller):
         self.model = Model()
         self.controller = controller
+        self.scores = {
+            'X' : -1,
+            'O' : 1,
+        }
 
     def computer(self, board):
         best_score = -1000
@@ -23,7 +27,10 @@ class Features:
     def minimax(self, board, is_maximizing):
         result = self.controller.get_winner(board)
         if result != ' ':
-            score = self.controller.scores[result]
+            score = self.scores[result]
+            return score
+        elif self.controller.is_draw(board):
+            return 0
         if is_maximizing:
             best_score = -99
             for key in board.keys():
@@ -63,6 +70,6 @@ class Features:
         return board
 
     def ask_load(self):
-        inp = input("Do you want load the previous game? y/n: ") #self.view.print_want_previous_game()
+        inp = input("Do you want load the previous game? y/n: ")
         if inp == 'y':
             self.model.board = self.features.load_game()

@@ -1,5 +1,6 @@
 from Model import *
 
+
 class View:
     """View is just for printing states and highlights input hints"""
     def __init__(self, model):
@@ -42,5 +43,3 @@ class View:
 
     def print_input_number(self):
         return "\nPlease, give a spot's position: "
-
-
